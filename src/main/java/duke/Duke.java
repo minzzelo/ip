@@ -23,6 +23,7 @@ public class Duke {
      */
     private Ui ui;
 
+
     /**
      * Creates a new instance of a Duke object with attributes defined
      * in the parameters.
@@ -32,6 +33,21 @@ public class Duke {
     public Duke(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
+        try {
+            tasks = new TaskList(storage.load());
+        } catch (DukeException e) {
+            ui.print(e.getMessage());
+        }
+    }
+
+    /**
+     * Creates a new instance of a Duke object with
+     * a predefined file path.
+     * Initializes the Ui, Storage and TaskList.
+     */
+    public Duke() {
+        ui = new Ui();
+        storage = new Storage("data/tasks.txt");
         try {
             tasks = new TaskList(storage.load());
         } catch (DukeException e) {
@@ -58,6 +74,16 @@ public class Duke {
             }
         }
     }
+
+    public String getResponse(String input) {
+        try {
+            Command c = Parser.parse(input);
+            return c.execute(tasks, ui, storage);
+        } catch (DukeException e) {
+            return ui.print(e.getMessage());
+        }
+    }
+
 
     /**
      * Runs the program.
